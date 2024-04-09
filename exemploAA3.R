@@ -2,7 +2,7 @@ library(dplyr)
 library(ggplot2)
 
 geraConjunto <- function(n){
-  return(sort(sample(x=1:(3*n),n,FALSE)))
+  return(sample(x=1:(3*n),n,FALSE))
 }
 
 geraT <- function(n){
@@ -18,16 +18,28 @@ exactSubsetSum <- function(S,n,t){
   return(max(L))
 }
 
-#PLACEHOLDER
-trim <- function(L,e){
-  return(L[sample(1:length(L),length(L)/2,FALSE)])
+trim <- function(L,e,i){
+  m <- length(L)
+  if(i==m){
+    return(L)
+  }
+  L2 <- c(L[i])
+  last <- L[i]
+  for(ii in (i+1):m){
+    if(L[ii]>last*(1+e)){
+      L2 <- c(L2,L[ii])
+      last <- L[ii]
+    }
+  }
+  return(L2)
 }
 
 aproxSubsetSum <- function(S,n,t,e){
   L <- c(0)
   for(i in 1:n){
+    lastLength <- length(L)
     L <- unique(c(L,(L+S[i])))
-    L <- trim(L,e/(2*n))
+    L <- trim(L,e/(2*n),lastLength)
     L <- L[L<=t]
   }
   return(max(L))
@@ -37,28 +49,38 @@ aproxSubsetSum <- function(S,n,t,e){
 experimento <- function(){
   exact <- c()
   aprox <- c()
+  exactResul <- c()
+  aproxResul <- c()
   e <- 0.4
   for(i in seq(50,2500,50)){
   S <- geraConjunto(i)
   t <- geraT(i)
   start <- Sys.time()
-  exactSubsetSum(S,i,t)
+  exactResul <- c(exactResul,exactSubsetSum(S,i,t))
   end <- Sys.time()
   exact <- c(exact,(end-start))
   start <- Sys.time()
-  aproxSubsetSum(S,i,t,e)
+  aproxResul <- c(aproxResul,aproxSubsetSum(S,i,t,e))
   end <- Sys.time()
   aprox <- c(aprox,(end-start))
-}
-  return(c(exact,aprox))
+  }
+  erroRelativo <- 100*(exactResul-aproxResul)/exactResul
+  return(c(exact,aprox,erroRelativo))
 }
 
-Tempo <- experimento()
-Tamanho <- seq(50,2500,50)
-Tamanho <- c(Tamanho, Tamanho)
+tamanho <- seq(50,2500,50)
+Expe <- experimento()
+Tempo <- Expe[1:(length(tamanho)*2)]
+ErroRelativo <- Expe[(length(tamanho)*2+1):(length(tamanho)*3)]
+Tamanho <- c(tamanho, tamanho)
 Algoritmo <- c(rep("Exato",length(Tempo)/2),rep("Aproximado",length(Tempo)/2))
-exactPlot <- data.frame(Tamanho, Tempo, Algoritmo)
+compPlot <- data.frame(Tamanho, Tempo, Algoritmo)
 
-ggplot(exactPlot, aes(x=Tamanho,y=Tempo))+
+ggplot(compPlot, aes(x=Tamanho,y=Tempo))+
   geom_line(aes(color=Algoritmo))
-  #geom_point(aes(color=algoritmo))
+  #geom_point(aes(color=Algoritmo))
+
+erroPlot <- data.frame(Tamanho, ErroRelativo)
+
+ggplot(erroPlot, aes(x=Tamanho,y=ErroRelativo))+
+  geom_line()
