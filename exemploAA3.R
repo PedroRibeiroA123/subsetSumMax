@@ -18,17 +18,14 @@ exactSubsetSum <- function(S,n,t){
   return(max(L))
 }
 
-trim <- function(L,e,i){
+trim <- function(L,e){
   m <- length(L)
-  if(i==m){
-    return(L)
-  }
-  L2 <- c(L[i])
-  last <- L[i]
-  for(ii in (i+1):m){
-    if(L[ii]>last*(1+e)){
-      L2 <- c(L2,L[ii])
-      last <- L[ii]
+  L2 <- c(L[1])
+  last <- L[1]
+  for(i in 2:m){
+    if(L[i]>last*(1+e)){
+      L2 <- c(L2,L[i])
+      last <- L[i]
     }
   }
   return(L2)
@@ -37,9 +34,8 @@ trim <- function(L,e,i){
 aproxSubsetSum <- function(S,n,t,e){
   L <- c(0)
   for(i in 1:n){
-    lastLength <- length(L)
     L <- unique(c(L,(L+S[i])))
-    L <- trim(L,e/(2*n),lastLength)
+    L <- trim(L,e/(2*n))
     L <- L[L<=t]
   }
   return(max(L))
@@ -64,6 +60,8 @@ experimento <- function(){
   end <- Sys.time()
   aprox <- c(aprox,(end-start))
   }
+  print(exactResul)
+  print(aproxResul)
   erroRelativo <- 100*(exactResul-aproxResul)/exactResul
   return(c(exact,aprox,erroRelativo))
 }
@@ -80,7 +78,7 @@ ggplot(compPlot, aes(x=Tamanho,y=Tempo))+
   geom_line(aes(color=Algoritmo))
   #geom_point(aes(color=Algoritmo))
 
-erroPlot <- data.frame(Tamanho, ErroRelativo)
+#erroPlot <- data.frame(Tamanho, ErroRelativo)
 
-ggplot(erroPlot, aes(x=Tamanho,y=ErroRelativo))+
-  geom_line()
+#ggplot(erroPlot, aes(x=Tamanho,y=ErroRelativo))+
+#  geom_line()
