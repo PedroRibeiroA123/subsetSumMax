@@ -47,7 +47,7 @@ experimento <- function(){
   aprox <- c()
   exactResul <- c()
   aproxResul <- c()
-  e <- 0.4
+  e <- 0.1
   for(i in seq(50,2500,50)){
   S <- geraConjunto(i)
   t <- geraT(i)
@@ -78,7 +78,7 @@ ggplot(compPlot, aes(x=Tamanho,y=Tempo))+
   geom_line(aes(color=Algoritmo))
   #geom_point(aes(color=Algoritmo))
 
-#erroPlot <- data.frame(Tamanho, ErroRelativo)
+erroPlot <- data.frame(Tamanho, ErroRelativo)
 
-#ggplot(erroPlot, aes(x=Tamanho,y=ErroRelativo))+
-#  geom_line()
+ggplot(erroPlot, aes(x=Tamanho,y=ErroRelativo))+
+  geom_line()
